@@ -81,7 +81,7 @@ typescript-publish-staging: typescript-check
 	case "$$version" in *-*) ;; *) echo "Staging version must be a prerelease such as 0.2.0-rc.1"; exit 1;; esac; \
 	stage_dir="$$(mktemp -d /tmp/logmate-npm-stage.XXXXXX)"; \
 	trap 'rm -rf "$$stage_dir"' EXIT HUP INT TERM; \
-	echo "Preparing @loghill-oss/logmate@$$version for npm tag next"; \
+	echo "Preparing @loghill-oss/logmate-client@$$version for npm tag next"; \
 	cd "$(TYPESCRIPT_DIR)"; \
 	LOGMATE_BUILD_VERSION="$$version" ./node_modules/.bin/tsup --out-dir "$$stage_dir/dist"; \
 	cp README.md package.json "$$stage_dir/"; \
@@ -89,7 +89,7 @@ typescript-publish-staging: typescript-check
 	node -e 'const fs=require("node:fs"); const path=process.argv[1]; const value=JSON.parse(fs.readFileSync(path,"utf8")); value.version=process.argv[2]; fs.writeFileSync(path, JSON.stringify(value,null,2)+"\n")' "$$stage_dir/package.json" "$$version"; \
 	cd "$$stage_dir"; \
 	$(NPM) publish --access public --tag next; \
-	echo "Published @loghill-oss/logmate@$$version (install with: npm install @loghill-oss/logmate@next)"
+	echo "Published @loghill-oss/logmate-client@$$version (install with: npm install @loghill-oss/logmate-client@next)"
 
 typescript-publish: typescript-check
 	@version="$$(cd "$(TYPESCRIPT_DIR)" && node -p "require('./package.json').version")"; \

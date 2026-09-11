@@ -10,7 +10,7 @@ metadata, and events to LogMate.
 [Back to all clients](../README.md) ·
 [Source](.) ·
 [Example](./examples/main.ts) ·
-[npm](https://www.npmjs.com/package/@loghill-oss/logmate)
+[npm](https://www.npmjs.com/package/@loghill-oss/logmate-client)
 
 ## What the TypeScript client does
 
@@ -37,25 +37,25 @@ It has no runtime npm dependencies and no native addon to compile.
 Install the production release selected by npm's `latest` tag:
 
 ```sh
-npm install @loghill-oss/logmate
+npm install @loghill-oss/logmate-client
 ```
 
 Install a specific production version:
 
 ```sh
-npm install @loghill-oss/logmate@0.1.0
+npm install @loghill-oss/logmate-client@0.1.0
 ```
 
 Install the current staging/prerelease build selected by `next`:
 
 ```sh
-npm install @loghill-oss/logmate@next
+npm install @loghill-oss/logmate-client@next
 ```
 
 You can also install an exact prerelease such as:
 
 ```sh
-npm install @loghill-oss/logmate@0.2.0-rc.12345
+npm install @loghill-oss/logmate-client@0.2.0-rc.12345
 ```
 
 Unlike Python, npm has no separate TestPyPI-style registry for this workflow.
@@ -68,7 +68,7 @@ This is the complete example from
 [`examples/main.ts`](./examples/main.ts):
 
 ```ts
-import { instrument } from "@loghill-oss/logmate";
+import { instrument } from "@loghill-oss/logmate-client";
 
 const logger = await instrument({
   apiUrl: "http://localhost:8080",
@@ -133,7 +133,7 @@ LOGMATE_SENDER_NAME=checkout-api
 Then instrument without connection arguments:
 
 ```ts
-import { instrument } from "@loghill-oss/logmate";
+import { instrument } from "@loghill-oss/logmate-client";
 
 const logger = await instrument();
 logger.info("Application started");
@@ -348,12 +348,12 @@ make typescript-publish-staging VERSION=0.2.0-rc.1
 Consumers opt into it with:
 
 ```sh
-npm install @loghill-oss/logmate@next
+npm install @loghill-oss/logmate-client@next
 ```
 
 Each staging merge generates a unique version such as
 `0.2.0-rc.<github-run-id>` and publishes it under `next`. It does not change
-what plain `npm install @loghill-oss/logmate` installs.
+what plain `npm install @loghill-oss/logmate-client` installs.
 
 npm also has a feature literally called *staged publishing*. That feature holds
 an artifact for human approval before it becomes installable; it is not a test

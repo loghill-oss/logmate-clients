@@ -9,9 +9,9 @@
   Official clients with structured metadata, events, health signals, retries,
   and SQLite-backed delivery.
 
-  [![Python](https://img.shields.io/pypi/v/logmate?logo=pypi&logoColor=white&label=Python)](https://pypi.org/project/logmate/)
+  [![Python](https://img.shields.io/pypi/v/logmate-client?logo=pypi&logoColor=white&label=Python)](https://pypi.org/project/logmate-client/)
   [![Go Reference](https://pkg.go.dev/badge/github.com/loghill-oss/logmate-clients/logmate-client-go.svg)](https://pkg.go.dev/github.com/loghill-oss/logmate-clients/logmate-client-go)
-  [![npm](https://img.shields.io/npm/v/%40loghill-oss%2Flogmate?logo=npm&label=TypeScript)](https://www.npmjs.com/package/@loghill-oss/logmate)
+  [![npm](https://img.shields.io/npm/v/%40loghill-oss%2Flogmate-client?logo=npm&label=TypeScript)](https://www.npmjs.com/package/@loghill-oss/logmate-client)
   [![Python CI](https://github.com/loghill-oss/logmate-clients/actions/workflows/ci-python.yml/badge.svg)](https://github.com/loghill-oss/logmate-clients/actions/workflows/ci-python.yml)
   [![Go CI](https://github.com/loghill-oss/logmate-clients/actions/workflows/ci-go.yml/badge.svg)](https://github.com/loghill-oss/logmate-clients/actions/workflows/ci-go.yml)
   [![TypeScript CI](https://github.com/loghill-oss/logmate-clients/actions/workflows/ci-typescript.yml/badge.svg)](https://github.com/loghill-oss/logmate-clients/actions/workflows/ci-typescript.yml)
@@ -37,9 +37,9 @@ any process that must keep useful diagnostic and business context around a log.
 
 | Language | Requirement | Download | Documentation |
 | --- | --- | --- | --- |
-| Python | Python 3.10+ | `pip install logmate` | [Python guide](./logmate-client-python/README.md) |
+| Python | Python 3.10+ | `pip install logmate-client` | [Python guide](./logmate-client-python/README.md) |
 | Go | Go 1.22+ | `go get github.com/loghill-oss/logmate-clients/logmate-client-go@latest` | [Go guide](./logmate-client-go/README.md) |
-| TypeScript | Node.js 22.13+ | `npm install @loghill-oss/logmate` | [TypeScript guide](./logmate-client-ts/README.md) |
+| TypeScript | Node.js 22.13+ | `npm install @loghill-oss/logmate-client` | [TypeScript guide](./logmate-client-ts/README.md) |
 
 Each client is versioned, tested, and published independently. Path-filtered
 workflows ensure that a change to one implementation does not publish either of
@@ -67,7 +67,7 @@ continues, but no network delivery is attempted.
 Install the package:
 
 ```sh
-python -m pip install logmate
+python -m pip install logmate-client
 ```
 
 Instrument the process and use the returned logger:
@@ -131,13 +131,13 @@ See the [complete Go guide](./logmate-client-go/README.md) and the
 Install the package:
 
 ```sh
-npm install @loghill-oss/logmate
+npm install @loghill-oss/logmate-client
 ```
 
 Instrument the process and await the initial connection attempts:
 
 ```ts
-import { instrument } from "@loghill-oss/logmate";
+import { instrument } from "@loghill-oss/logmate-client";
 
 const logger = await instrument({
   apiUrl: "http://localhost:8080",

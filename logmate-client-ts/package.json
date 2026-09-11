@@ -1,5 +1,5 @@
 {
-  "name": "@loghill-oss/logmate",
+  "name": "@loghill-oss/logmate-client",
   "version": "0.1.0",
   "description": "Resilient TypeScript client for sending logs to LogMate",
   "license": "CPAL-1.0",

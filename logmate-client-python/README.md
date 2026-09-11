@@ -10,7 +10,7 @@ to LogMate.
 [Back to all clients](../README.md) ·
 [Source](.) ·
 [Example](./examples/main.py) ·
-[PyPI](https://pypi.org/project/logmate/)
+[PyPI](https://pypi.org/project/logmate-client/)
 
 ## What the Python client does
 
@@ -35,13 +35,16 @@ The package requires Python 3.10 or newer.
 Install the current production release from PyPI:
 
 ```sh
-python -m pip install logmate
+python -m pip install logmate-client
 ```
+
+The distribution name is `logmate-client`; the Python import remains
+`import logmate`.
 
 Install a specific production version:
 
 ```sh
-python -m pip install "logmate==X.Y.Z"
+python -m pip install "logmate-client==X.Y.Z"
 ```
 
 Development builds are published to TestPyPI after changes reach `staging`.
@@ -51,7 +54,7 @@ Use the complete version shown by the CI run, for example:
 python -m pip install \
   --index-url https://test.pypi.org/simple/ \
   --extra-index-url https://pypi.org/simple/ \
-  "logmate==0.1.2.dev12345"
+  "logmate-client==0.1.2.dev12345"
 ```
 
 ## Quick start

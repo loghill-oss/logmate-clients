@@ -1,4 +1,4 @@
-import { instrument } from "@loghill-oss/logmate";
+import { instrument } from "@loghill-oss/logmate-client";
 
 const logger = await instrument({
   apiUrl: "http://localhost:8080",

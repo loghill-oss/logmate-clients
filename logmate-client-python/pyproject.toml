@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "logmate"
+name = "logmate-client"
 version = "0.1.1dev"
 description = "Resilient Python client for sending logs to LogMate"
 readme = "README.md"
