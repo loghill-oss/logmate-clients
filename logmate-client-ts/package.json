@@ -1,0 +1,61 @@
+{
+  "name": "@loghill-oss/logmate",
+  "version": "0.1.0",
+  "description": "Resilient TypeScript client for sending logs to LogMate",
+  "license": "CPAL-1.0",
+  "author": {
+    "name": "Pedro Filipe",
+    "email": "pedrofilipe.github@gmail.com"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "assets",
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build && npm pack --dry-run",
+    "example": "tsx examples/main.ts"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loghill-oss/logmate-clients.git",
+    "directory": "logmate-client-ts"
+  },
+  "homepage": "https://github.com/loghill-oss/logmate-clients#readme",
+  "bugs": {
+    "url": "https://github.com/loghill-oss/logmate-clients/issues"
+  },
+  "keywords": [
+    "logging",
+    "observability",
+    "logmate",
+    "typescript"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.19.15",
+    "tsx": "^4.21.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

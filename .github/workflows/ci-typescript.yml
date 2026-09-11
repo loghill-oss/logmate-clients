@@ -1,0 +1,100 @@
+name: TypeScript client CI
+
+on:
+  pull_request:
+    paths:
+      - "logmate-client-ts/**"
+      - ".github/workflows/ci-typescript.yml"
+      - ".github/workflows/release-typescript.yml"
+  push:
+    branches: [main, staging]
+    paths:
+      - "logmate-client-ts/**"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: logmate-client-ts
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["22", "24"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: logmate-client-ts/package-lock.json
+      - run: npm ci
+      - run: npm run check
+
+  publish-next:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: npm-staging
+      url: https://www.npmjs.com/package/@loghill-oss/logmate
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@latest
+      - run: npm ci
+      - name: Generate unique prerelease version
+        env:
+          NPM_BUILD_NUMBER: ${{ github.run_id }}
+        run: |
+          base_version=$(node -p "require('./package.json').version.split('-')[0]")
+          npm version "${base_version}-rc.${NPM_BUILD_NUMBER}" --no-git-tag-version
+      - run: npm run check
+      - name: Publish prerelease on the next channel
+        run: |
+          package=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          if npm view "${package}@${version}" version >/dev/null 2>&1; then
+            echo "${package}@${version} is already published; skipping this rerun."
+          else
+            npm publish --access public --tag next
+          fi
+
+  publish-latest:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/@loghill-oss/logmate
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Install npm with trusted publishing support
+        run: npm install --global npm@latest
+      - run: npm ci
+      - name: Require a stable package version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          case "$version" in *-*) echo "main must contain a stable npm version"; exit 1;; esac
+      - run: npm run check
+      - name: Publish production release on the latest channel
+        run: npm publish --access public --tag latest

@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "logmate"
+version = "0.1.1dev"
+description = "Resilient Python client for sending logs to LogMate"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "CPAL-1.0"
+authors = [
+  { name = "Pedro Filipe", email = "pedrofilipe.github@gmail.com" },
+]
+keywords = ["logging", "observability", "logmate"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/loghill-oss/logmate-clients"
+Repository = "https://github.com/loghill-oss/logmate-clients.git"
+Documentation = "https://github.com/loghill-oss/logmate-clients/blob/main/logmate-client-python/README.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]

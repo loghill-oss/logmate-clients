@@ -1,0 +1,31 @@
+name: Release Python client
+
+on:
+  push:
+    tags:
+      - "logmate-client-python/v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Verify release tag
+        working-directory: logmate-client-python
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          package_version=$(python -c 'import pathlib, tomllib; print(tomllib.loads(pathlib.Path("pyproject.toml").read_text())["project"]["version"])')
+          test "$RELEASE_TAG" = "logmate-client-python/v$package_version"
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag

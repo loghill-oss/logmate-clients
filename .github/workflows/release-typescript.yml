@@ -1,0 +1,31 @@
+name: Release TypeScript client
+
+on:
+  push:
+    tags:
+      - "logmate-client-ts/v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+      - name: Verify release tag
+        working-directory: logmate-client-ts
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          package_version=$(node -p "require('./package.json').version")
+          test "$RELEASE_TAG" = "logmate-client-ts/v$package_version"
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes --verify-tag

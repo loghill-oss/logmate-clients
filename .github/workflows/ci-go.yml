@@ -1,0 +1,128 @@
+name: Go client CI
+
+on:
+  pull_request:
+    paths:
+      - "logmate-client-go/**"
+      - ".github/workflows/ci-go.yml"
+      - ".github/workflows/release-go.yml"
+  push:
+    branches: [main, staging]
+    paths:
+      - "logmate-client-go/**"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: logmate-client-go
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22.x"
+          cache-dependency-path: logmate-client-go/go.sum
+      - run: CGO_ENABLED=0 go test ./...
+      - run: go test -race ./...
+      - run: go vet ./...
+
+  publish-staging:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: go-staging
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Determine prerelease version
+        id: version
+        env:
+          PRERELEASE_NUMBER: ${{ github.run_id }}
+        run: |
+          package_version=$(sed -n 's/^const Version = "\([^"]*\)"/\1/p' src/logmate/types.go)
+          test -n "$package_version"
+          echo "tag=logmate-client-go/v${package_version}-rc.${PRERELEASE_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "version=v${package_version}-rc.${PRERELEASE_NUMBER}" >> "$GITHUB_OUTPUT"
+      - name: Publish Go prerelease tag
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          existing_commit=$(git rev-list -n 1 "$RELEASE_TAG" 2>/dev/null || true)
+          if test -n "$existing_commit" && test "$existing_commit" != "$GITHUB_SHA"; then
+            echo "::error::Tag $RELEASE_TAG already points to another commit"
+            exit 1
+          fi
+          if test -z "$existing_commit"; then
+            git tag "$RELEASE_TAG" "$GITHUB_SHA"
+            git push origin "$RELEASE_TAG"
+          fi
+      - name: Create GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        working-directory: .
+        run: |
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 || \
+            gh release create "$RELEASE_TAG" --prerelease --generate-notes --verify-tag
+      - name: Show prerelease install command
+        env:
+          MODULE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          echo '```sh' >> "$GITHUB_STEP_SUMMARY"
+          echo "go get github.com/loghill-oss/logmate-clients/logmate-client-go@${MODULE_VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+  publish-production:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    environment: go-production
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Determine production version
+        id: version
+        run: |
+          package_version=$(sed -n 's/^const Version = "\([^"]*\)"/\1/p' src/logmate/types.go)
+          test -n "$package_version"
+          echo "tag=logmate-client-go/v${package_version}" >> "$GITHUB_OUTPUT"
+          echo "version=v${package_version}" >> "$GITHUB_OUTPUT"
+      - name: Publish stable Go tag
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          existing_commit=$(git rev-list -n 1 "$RELEASE_TAG" 2>/dev/null || true)
+          if test -n "$existing_commit" && test "$existing_commit" != "$GITHUB_SHA"; then
+            echo "::error::Version already published by tag $RELEASE_TAG; increment Version before merging into main"
+            exit 1
+          fi
+          if test -z "$existing_commit"; then
+            git tag "$RELEASE_TAG" "$GITHUB_SHA"
+            git push origin "$RELEASE_TAG"
+          fi
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        working-directory: .
+        run: |
+          gh release view "$RELEASE_TAG" >/dev/null 2>&1 || \
+            gh release create "$RELEASE_TAG" --generate-notes --verify-tag
+      - name: Show production install command
+        env:
+          MODULE_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          echo '```sh' >> "$GITHUB_STEP_SUMMARY"
+          echo "go get github.com/loghill-oss/logmate-clients/logmate-client-go@${MODULE_VERSION}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

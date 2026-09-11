@@ -1,0 +1,135 @@
+name: Python client CI
+
+on:
+  pull_request:
+    paths:
+      - "logmate-client-python/**"
+      - ".github/workflows/ci-python.yml"
+      - ".github/workflows/release-python.yml"
+  push:
+    branches: [main, staging]
+    paths:
+      - "logmate-client-python/**"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: logmate-client-python
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: python -m compileall -q src examples
+      - run: python -m pip install build
+      - run: python -m build
+
+  build-testpypi:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Generate unique TestPyPI version
+        env:
+          TESTPYPI_BUILD_NUMBER: ${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          import os
+          import pathlib
+          import re
+
+          path = pathlib.Path("pyproject.toml")
+          content = path.read_text()
+          match = re.search(r'^version = "([^"]+)"$', content, re.MULTILINE)
+          if match is None:
+              raise SystemExit("project version was not found in pyproject.toml")
+
+          version = f"{match.group(1)}.dev{os.environ['TESTPYPI_BUILD_NUMBER']}"
+          content = content[:match.start(1)] + version + content[match.end(1):]
+          path.write_text(content)
+          print(f"Building TestPyPI version {version}")
+          PY
+      - run: python -m pip install build
+      - run: python -m build
+      - name: Store Python distributions
+        uses: actions/upload-artifact@v6
+        with:
+          name: python-testpypi-distributions
+          path: logmate-client-python/dist/
+          if-no-files-found: error
+
+  publish-testpypi:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    needs: build-testpypi
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/logmate
+    permissions:
+      id-token: write
+    steps:
+      - name: Download Python distributions
+        uses: actions/download-artifact@v6
+        with:
+          name: python-testpypi-distributions
+          path: dist/
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: dist/
+          skip-existing: true
+
+  build-pypi:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: python -m pip install build
+      - run: python -m build
+      - name: Store Python distributions
+        uses: actions/upload-artifact@v6
+        with:
+          name: python-pypi-distributions
+          path: logmate-client-python/dist/
+          if-no-files-found: error
+
+  publish-pypi:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build-pypi
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/logmate
+    permissions:
+      id-token: write
+    steps:
+      - name: Download Python distributions
+        uses: actions/download-artifact@v6
+        with:
+          name: python-pypi-distributions
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
