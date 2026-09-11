@@ -335,6 +335,8 @@ The automated release channels are:
   `.dev<github-run-id>` version to TestPyPI;
 - changes reaching `main` publish the exact version from `pyproject.toml` to
   PyPI after the test matrix passes;
+- a manual `Run workflow` on `staging` or `main` performs the corresponding
+  publication after the same tests pass;
 - a `logmate-client-python/vX.Y.Z` tag creates the matching GitHub Release.
 
 Increment the version in `logmate-client-python/pyproject.toml` before merging

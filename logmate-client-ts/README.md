@@ -379,6 +379,8 @@ the version must be increased before every production publication.
   client and publishes a unique prerelease under `next`.
 - A push/merge to `main` that changes `logmate-client-ts/**` tests only this
   client and publishes the stable package version under `latest`.
+- A manual `Run workflow` on `staging` publishes `next`; on `main`, it publishes
+  `latest`. Other branches run only the test job.
 - Changes limited to Python or Go do not start either TypeScript publish job.
 
 An optional GitHub release can be created with a matching tag such as

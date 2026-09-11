@@ -33,7 +33,7 @@ jobs:
       - run: go vet ./...
 
   publish-staging:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/staging'
     needs: test
     runs-on: ubuntu-latest
     environment: go-staging
@@ -82,7 +82,7 @@ jobs:
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
   publish-production:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-latest
     environment: go-production

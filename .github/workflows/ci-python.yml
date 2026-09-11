@@ -36,7 +36,7 @@ jobs:
       - run: python -m build
 
   build-testpypi:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/staging'
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -75,7 +75,7 @@ jobs:
           if-no-files-found: error
 
   publish-testpypi:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/staging'
     needs: build-testpypi
     runs-on: ubuntu-latest
     environment:
@@ -97,7 +97,7 @@ jobs:
           skip-existing: true
 
   build-pypi:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -116,7 +116,7 @@ jobs:
           if-no-files-found: error
 
   publish-pypi:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: build-pypi
     runs-on: ubuntu-latest
     environment:

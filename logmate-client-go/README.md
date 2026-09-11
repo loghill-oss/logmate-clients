@@ -369,6 +369,8 @@ the same module path and are separated by semantic versions:
   such as `logmate-client-go/v0.1.1-rc.<github-run-id>` and a GitHub prerelease;
 - changes reaching `main` create the stable tag declared by `Version`, such as
   `logmate-client-go/v0.1.1`, and a GitHub Release;
+- a manual `Run workflow` on `staging` or `main` performs the corresponding tag
+  and GitHub Release publication after the tests pass;
 - the tag-based release workflow remains available as a manual fallback.
 
 Set `Version` in `logmate-client-go/src/logmate/types.go` to the next target
