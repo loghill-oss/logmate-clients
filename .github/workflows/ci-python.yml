@@ -1,6 +1,7 @@
 name: Python client CI
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "logmate-client-python/**"

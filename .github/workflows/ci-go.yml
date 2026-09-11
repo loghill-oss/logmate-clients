@@ -1,6 +1,7 @@
 name: Go client CI
 
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "logmate-client-go/**"
