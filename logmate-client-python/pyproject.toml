@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "logmate-client"
-version = "0.1.1dev"
+version = "0.1.0"
 description = "Resilient Python client for sending logs to LogMate"
 readme = "README.md"
 requires-python = ">=3.10"
